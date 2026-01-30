@@ -55,12 +55,6 @@ dotnet publish -c Release -r linux-x64 /p:PublishAot=true
 ./bin/Release/net8.0/linux-x64/publish/SystemCommandLineSpectre greet --name World
 ```
 
-**macOS (ARM64):**
-```bash
-dotnet publish -c Release -r osx-arm64 /p:PublishAot=true
-./bin/Release/net8.0/osx-arm64/publish/SystemCommandLineSpectre greet --name World
-```
-
 ## Binary Size
 
 Typical AOT binary size: **~8-12 MB** (trimmed, compressed)
@@ -77,7 +71,7 @@ Typical AOT binary size: **~8-12 MB** (trimmed, compressed)
 |---------|---------|--------|
 | System.CommandLine | 2.0.2 | CLI argument parsing |
 | Spectre.Console | 0.53.1 | Terminal UI rendering |
-| .NET | 8.0+ | Runtime |
+| .NET | 10.0+ | Runtime |
 
 ## Project Structure
 
@@ -90,7 +84,7 @@ Typical AOT binary size: **~8-12 MB** (trimmed, compressed)
 
 ## Requirements
 
-- **.NET 8.0 SDK** or later
+- **.NET 10.0 SDK** or later
 - **C# 12** or later
 
 ## License
