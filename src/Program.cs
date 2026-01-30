@@ -24,7 +24,7 @@ greetCommand.SetAction(parseResult =>
 {
     var name = parseResult.GetValue(nameOption);
     var count = parseResult.GetValue(countOption);
-    
+
     var table = new Table()
         .Border(TableBorder.Rounded)
         .AddColumn(new TableColumn("[bold yellow]Property[/]").Centered())
@@ -80,7 +80,7 @@ listCommand.Add(itemsOption);
 listCommand.SetAction(parseResult =>
 {
     var items = parseResult.GetValue(itemsOption);
-    
+
     var rule = new Rule("[bold yellow]📋 Item List[/]")
     {
         Justification = Justify.Left
@@ -112,7 +112,7 @@ progressCommand.Add(durationOption);
 progressCommand.SetAction(async parseResult =>
 {
     var duration = parseResult.GetValue(durationOption);
-    
+
     await AnsiConsole.Progress()
         .Columns(
             new TaskDescriptionColumn(),
