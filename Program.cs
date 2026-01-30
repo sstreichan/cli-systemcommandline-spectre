@@ -1,19 +1,30 @@
 using System.CommandLine;
-using System.CommandLine.Invocation;
+using System.CommandLine.Parsing;
 using Spectre.Console;
 
 var rootCommand = new RootCommand("Demo CLI using System.CommandLine + Spectre.Console (AOT-compatible)");
 
 // --- GREET COMMAND ---
 var greetCommand = new Command("greet", "Greet someone with a fancy table");
-var nameOption = new Option<string>("--name", () => "World", "The name to greet");
-var countOption = new Option<int>("--count", () => 1, "Number of times to greet");
+var nameOption = new Option<string>("--name")
+{
+    Description = "The name to greet",
+    DefaultValueFactory = _ => "World"
+};
+var countOption = new Option<int>("--count")
+{
+    Description = "Number of times to greet",
+    DefaultValueFactory = _ => 1
+};
 
 greetCommand.Add(nameOption);
 greetCommand.Add(countOption);
 
-greetCommand.Handler = CommandHandler.Create<string, int>((name, count) =>
+greetCommand.SetAction(parseResult =>
 {
+    var name = parseResult.GetValue(nameOption);
+    var count = parseResult.GetValue(countOption);
+    
     var table = new Table()
         .Border(TableBorder.Rounded)
         .AddColumn(new TableColumn("[bold yellow]Property[/]").Centered())
@@ -35,7 +46,7 @@ greetCommand.Handler = CommandHandler.Create<string, int>((name, count) =>
 // --- INFO COMMAND ---
 var infoCommand = new Command("info", "Display system information");
 
-infoCommand.Handler = CommandHandler.Create(() =>
+infoCommand.SetAction(_ =>
 {
     var panel = new Panel(
         new Markup(
@@ -57,20 +68,19 @@ infoCommand.Handler = CommandHandler.Create(() =>
 
 // --- LIST COMMAND ---
 var listCommand = new Command("list", "Display a list of items");
-var itemsOption = new Option<string[]>("--items", "Items to display") 
-{ 
-    AllowMultipleArgumentsPerToken = true 
+var itemsOption = new Option<string[]>("--items")
+{
+    Description = "Items to display",
+    AllowMultipleArgumentsPerToken = true,
+    DefaultValueFactory = _ => new[] { "Apple", "Banana", "Cherry", "Date", "Elderberry" }
 };
 
 listCommand.Add(itemsOption);
 
-listCommand.Handler = CommandHandler.Create<string[]>((items) =>
+listCommand.SetAction(parseResult =>
 {
-    if (items == null || items.Length == 0)
-    {
-        items = new[] { "Apple", "Banana", "Cherry", "Date", "Elderberry" };
-    }
-
+    var items = parseResult.GetValue(itemsOption);
+    
     var rule = new Rule("[bold yellow]📋 Item List[/]")
     {
         Justification = Justify.Left
@@ -78,9 +88,12 @@ listCommand.Handler = CommandHandler.Create<string[]>((items) =>
     AnsiConsole.Write(rule);
 
     var list = new List<string>();
-    foreach (var item in items)
+    if (items != null)
     {
-        list.Add($"[cyan]•[/] [white]{item}[/]");
+        foreach (var item in items)
+        {
+            list.Add($"[cyan]•[/] [white]{item}[/]");
+        }
     }
 
     AnsiConsole.MarkupLine(string.Join("\n", list));
@@ -88,12 +101,18 @@ listCommand.Handler = CommandHandler.Create<string[]>((items) =>
 
 // --- PROGRESS COMMAND ---
 var progressCommand = new Command("progress", "Show a progress bar demo");
-var durationOption = new Option<int>("--duration", () => 3, "Duration in seconds");
+var durationOption = new Option<int>("--duration")
+{
+    Description = "Duration in seconds",
+    DefaultValueFactory = _ => 3
+};
 
 progressCommand.Add(durationOption);
 
-progressCommand.Handler = CommandHandler.Create<int>(async (duration) =>
+progressCommand.SetAction(async parseResult =>
 {
+    var duration = parseResult.GetValue(durationOption);
+    
     await AnsiConsole.Progress()
         .Columns(
             new TaskDescriptionColumn(),
@@ -128,4 +147,4 @@ rootCommand.Add(infoCommand);
 rootCommand.Add(listCommand);
 rootCommand.Add(progressCommand);
 
-return await rootCommand.InvokeAsync(args);
+return rootCommand.Parse(args).Invoke();
