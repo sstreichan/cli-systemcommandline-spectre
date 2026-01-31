@@ -1,18 +1,31 @@
 using System.CommandLine;
 using System.CommandLine.Parsing;
 using Spectre.Console;
+using SystemCommandLineSpectre.Infrastructure;
 
 namespace SystemCommandLineSpectre.Commands;
 
+/// <summary>
+/// Factory class for creating the Progress command.
+/// Displays a progress bar demonstration with configurable duration.
+/// </summary>
 public static class ProgressCommand
 {
-    public static Command Create()
+    /// <summary>
+    /// Creates and configures the Progress command with its handler and options.
+    /// </summary>
+    /// <param name="handler">The command handler responsible for executing the progress command.</param>
+    /// <returns>A configured Command instance for progress bar demonstration.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when handler is null.</exception>
+    public static Command Create(IProgressCommandHandler handler)
     {
+        ArgumentNullException.ThrowIfNull(handler);
+
         var progressCommand = new Command("progress", "Show a progress bar demo");
-        
+
         var durationOption = new Option<int>("--duration")
         {
-            Description = "Duration in seconds",
+            Description = "Duration in seconds for the progress demonstration",
             DefaultValueFactory = _ => 3
         };
 
@@ -20,34 +33,37 @@ public static class ProgressCommand
 
         progressCommand.SetAction(async parseResult =>
         {
-            var duration = parseResult.GetValue(durationOption);
-
-            await AnsiConsole.Progress()
-                .Columns(
-                    new TaskDescriptionColumn(),
-                    new ProgressBarColumn(),
-                    new PercentageColumn(),
-                    new SpinnerColumn()
-                )
-                .StartAsync(async ctx =>
+            try
+            {
+                var duration = parseResult.GetValue(durationOption);
+                
+                // Validate duration
+                if (duration <= 0)
                 {
-                    var task1 = ctx.AddTask("[green]Processing files[/]");
-                    var task2 = ctx.AddTask("[yellow]Downloading data[/]");
-                    var task3 = ctx.AddTask("[cyan]Building cache[/]");
+                    AnsiConsole.MarkupLine("[red]Error: Duration must be greater than 0 seconds.[/]");
+                    Environment.ExitCode = 1;
+                    return;
+                }
 
-                    var steps = duration * 10;
-                    for (int i = 0; i < steps; i++)
-                    {
-                        await Task.Delay(100);
-                        task1.Increment(100.0 / steps);
-                        if (i > steps / 3)
-                            task2.Increment(100.0 / steps);
-                        if (i > steps / 2)
-                            task3.Increment(100.0 / steps);
-                    }
-                });
-
-            AnsiConsole.MarkupLine("[bold green]✓ All tasks completed![/]");
+                handler.SetDuration(duration);
+                var exitCode = await handler.ExecuteAsync();
+                Environment.ExitCode = exitCode;
+            }
+            catch (OperationCanceledException)
+            {
+                AnsiConsole.MarkupLine("[yellow]Progress command cancelled.[/]");
+                Environment.ExitCode = 1;
+            }
+            catch (ArgumentException ex)
+            {
+                AnsiConsole.MarkupLine($"[red]Invalid argument: {ex.Message}[/]");
+                Environment.ExitCode = 1;
+            }
+            catch (Exception ex)
+            {
+                AnsiConsole.MarkupLine($"[red]Error: {ex.Message}[/]");
+                Environment.ExitCode = 1;
+            }
         });
 
         return progressCommand;

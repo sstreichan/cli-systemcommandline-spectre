@@ -49,6 +49,12 @@ dotnet publish -c Release -r win-x64 /p:PublishAot=true
 .\bin\Release\net8.0\win-x64\publish\SystemCommandLineSpectre.exe greet --name World
 ```
 
+**Windows (arm64):**
+```bash
+dotnet publish -c Release -r win-arm64 /p:PublishAot=true
+.\bin\Release\net8.0\win-arm64\publish\SystemCommandLineSpectre.exe greet --name World
+```
+
 **Linux (x64):**
 ```bash
 dotnet publish -c Release -r linux-x64 /p:PublishAot=true
