@@ -1,4 +1,4 @@
-namespace SystemCommandLineSpectre.Infrastructure;
+namespace SystemCommandLineSpectre.Console.Infrastructure;
 
 /// <summary>
 /// Custom exception for command execution errors.

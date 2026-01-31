@@ -1,9 +1,7 @@
-using System.CommandLine;
 using System.CommandLine.Parsing;
 using Spectre.Console;
-using SystemCommandLineSpectre.Infrastructure;
 
-namespace SystemCommandLineSpectre.Commands;
+namespace SystemCommandLineSpectre.Console.Commands;
 
 /// <summary>
 /// Factory class for creating the Progress command.
@@ -17,7 +15,7 @@ public static class ProgressCommand
     /// <param name="handler">The command handler responsible for executing the progress command.</param>
     /// <returns>A configured Command instance for progress bar demonstration.</returns>
     /// <exception cref="ArgumentNullException">Thrown when handler is null.</exception>
-    public static Command Create(IProgressCommandHandler handler)
+    public static Command Create(CommandHandler<ProgressCommandOptions> handler)
     {
         ArgumentNullException.ThrowIfNull(handler);
 
@@ -37,31 +35,30 @@ public static class ProgressCommand
             {
                 var duration = parseResult.GetValue(durationOption);
                 
-                // Validate duration
-                if (duration <= 0)
-                {
-                    AnsiConsole.MarkupLine("[red]Error: Duration must be greater than 0 seconds.[/]");
-                    Environment.ExitCode = 1;
-                    return;
-                }
+                var options = new ProgressCommandOptions { DurationSeconds = duration };
+                handler.SetOptions(options); // Validates automatically
 
-                handler.SetDuration(duration);
                 var exitCode = await handler.ExecuteAsync();
                 Environment.ExitCode = exitCode;
             }
+            catch (ArgumentOutOfRangeException ex)
+            {
+                AnsiConsole.MarkupLine($"[red]{string.Format(Messages.Error.Command_InvalidArgument, ex.Message)}[/]");
+                Environment.ExitCode = 1;
+            }
             catch (OperationCanceledException)
             {
-                AnsiConsole.MarkupLine("[yellow]Progress command cancelled.[/]");
+                AnsiConsole.MarkupLine($"[yellow]{Messages.Error.ProgressCommand_Cancelled}[/]");
                 Environment.ExitCode = 1;
             }
             catch (ArgumentException ex)
             {
-                AnsiConsole.MarkupLine($"[red]Invalid argument: {ex.Message}[/]");
+                AnsiConsole.MarkupLine($"[red]{string.Format(Messages.Error.Command_InvalidArgument, ex.Message)}[/]");
                 Environment.ExitCode = 1;
             }
             catch (Exception ex)
             {
-                AnsiConsole.MarkupLine($"[red]Error: {ex.Message}[/]");
+                AnsiConsole.MarkupLine($"[red]{string.Format(Messages.Error.Command_ExecutionError, ex.Message)}[/]");
                 Environment.ExitCode = 1;
             }
         });

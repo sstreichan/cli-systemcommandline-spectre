@@ -1,4 +1,4 @@
-namespace SystemCommandLineSpectre.Infrastructure;
+namespace SystemCommandLineSpectre.Console.Infrastructure;
 
 /// <summary>
 /// Base interface for all command handlers in the CLI application.

@@ -1,9 +1,11 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
 VisualStudioVersion = 18.2.11415.280 d18.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SystemCommandLineSpectre", "src\SystemCommandLineSpectre.csproj", "{4A727F63-780D-DC2C-15B5-4CE0CE24BE82}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SystemCommandLineSpectre.Tests", "tests\SystemCommandLineSpectre.Tests\SystemCommandLineSpectre.Tests.csproj", "{B5E9F7D4-8C3A-4F2E-9A1B-6D4E7F8C9A2B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{4A727F63-780D-DC2C-15B5-4CE0CE24BE82}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4A727F63-780D-DC2C-15B5-4CE0CE24BE82}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4A727F63-780D-DC2C-15B5-4CE0CE24BE82}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B5E9F7D4-8C3A-4F2E-9A1B-6D4E7F8C9A2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5E9F7D4-8C3A-4F2E-9A1B-6D4E7F8C9A2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5E9F7D4-8C3A-4F2E-9A1B-6D4E7F8C9A2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5E9F7D4-8C3A-4F2E-9A1B-6D4E7F8C9A2B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

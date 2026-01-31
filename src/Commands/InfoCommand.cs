@@ -1,8 +1,6 @@
-using System.CommandLine;
 using Spectre.Console;
-using SystemCommandLineSpectre.Infrastructure;
 
-namespace SystemCommandLineSpectre.Commands;
+namespace SystemCommandLineSpectre.Console.Commands;
 
 /// <summary>
 /// Factory class for creating the Info command.
@@ -31,12 +29,12 @@ public static class InfoCommand
             }
             catch (OperationCanceledException)
             {
-                AnsiConsole.MarkupLine("[yellow]Info command cancelled.[/]");
+                AnsiConsole.MarkupLine($"[yellow]{Messages.Error.InfoCommand_Cancelled}[/]");
                 Environment.ExitCode = 1;
             }
             catch (Exception ex)
             {
-                AnsiConsole.MarkupLine($"[red]Error: {ex.Message}[/]");
+                AnsiConsole.MarkupLine($"[red]{string.Format(Messages.Error.Command_ExecutionError, ex.Message)}[/]");
                 Environment.ExitCode = 1;
             }
         });

@@ -1,5 +1,9 @@
+global using Microsoft.VisualStudio.TestTools.UnitTesting;
+global using FluentAssertions;
+global using Moq;
 global using System.CommandLine;
 global using Microsoft.Extensions.DependencyInjection;
+global using Microsoft.Extensions.Logging;
 global using SystemCommandLineSpectre.Console.Commands;
 global using SystemCommandLineSpectre.Console.Infrastructure;
 global using SystemCommandLineSpectre.Console.Resources;

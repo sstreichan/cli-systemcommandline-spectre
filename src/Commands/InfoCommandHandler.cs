@@ -1,8 +1,7 @@
-namespace SystemCommandLineSpectre.Commands;
-
 using Microsoft.Extensions.Logging;
 using Spectre.Console;
-using SystemCommandLineSpectre.Infrastructure;
+
+namespace SystemCommandLineSpectre.Console.Commands;
 
 /// <summary>
 /// Handler interface for the Info command.
@@ -26,32 +25,32 @@ public class InfoCommandHandler(ILogger<InfoCommandHandler> logger) : IInfoComma
     {
         try
         {
-            logger.LogInformation("Executing info command");
+            logger.LogInformation(Messages.Log.InfoCommand_Executing);
 
             var panel = new Panel(
                 new Markup(
-                    $"[bold]System Information[/]\n\n" +
-                    $"[yellow]OS:[/] {Environment.OSVersion}\n" +
-                    $"[yellow]Runtime:[/] {Environment.Version}\n" +
-                    $"[yellow]Machine:[/] {Environment.MachineName}\n" +
-                    $"[yellow]User:[/] {Environment.UserName}\n" +
-                    $"[yellow]64-bit:[/] {Environment.Is64BitOperatingSystem}\n" +
-                    $"[yellow]Processors:[/] {Environment.ProcessorCount}"
+                    $"[bold]{Messages.Ui.InfoPanel_Title}[/]\n\n" +
+                    $"[yellow]{Messages.Ui.InfoPanel_OS}[/] {Environment.OSVersion}\n" +
+                    $"[yellow]{Messages.Ui.InfoPanel_Runtime}[/] {Environment.Version}\n" +
+                    $"[yellow]{Messages.Ui.InfoPanel_Machine}[/] {Environment.MachineName}\n" +
+                    $"[yellow]{Messages.Ui.InfoPanel_User}[/] {Environment.UserName}\n" +
+                    $"[yellow]{Messages.Ui.InfoPanel_64Bit}[/] {Environment.Is64BitOperatingSystem}\n" +
+                    $"[yellow]{Messages.Ui.InfoPanel_Processors}[/] {Environment.ProcessorCount}"
                 )
             )
             .Border(BoxBorder.Double)
             .BorderColor(Color.Cyan1)
-            .Header("[bold cyan]📊 System Info [/]");
+            .Header($"[bold cyan]{Messages.Ui.InfoPanel_Header}[/]");
 
             AnsiConsole.Write(panel);
-            logger.LogInformation("Info command completed successfully");
+            logger.LogInformation(Messages.Log.InfoCommand_Completed);
 
             return await Task.FromResult(0);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error executing info command");
-            AnsiConsole.MarkupLine($"[red]Error: {ex.Message}[/]");
+            logger.LogError(ex, Messages.Log.InfoCommand_ExecutionError);
+            AnsiConsole.MarkupLine(string.Format(Messages.Error.Command_ExecutionError, ex.Message));
             return 1;
         }
     }

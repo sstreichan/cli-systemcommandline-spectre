@@ -1,56 +1,24 @@
-namespace SystemCommandLineSpectre.Commands;
-
 using Microsoft.Extensions.Logging;
 using Spectre.Console;
-using SystemCommandLineSpectre.Infrastructure;
 
-/// <summary>
-/// Handler interface for the Progress command.
-/// Displays a progress bar demo with configurable duration.
-/// </summary>
-public interface IProgressCommandHandler : ICommandHandler
-{
-    /// <summary>
-    /// Sets the duration for the progress bar in seconds.
-    /// </summary>
-    /// <param name="durationSeconds">The duration in seconds (must be positive).</param>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown when duration is less than or equal to 0.</exception>
-    void SetDuration(int durationSeconds);
-}
+namespace SystemCommandLineSpectre.Console.Commands;
 
 /// <summary>
 /// Implements the Progress command handler.
 /// Displays a progress bar with multiple tasks to demonstrate Spectre.Console capabilities.
 /// </summary>
-public class ProgressCommandHandler(ILogger<ProgressCommandHandler> logger) : IProgressCommandHandler
+public class ProgressCommandHandler(ILogger<ProgressCommandHandler> logger) 
+    : CommandHandler<ProgressCommandOptions>(logger)
 {
-    private int _durationSeconds = 3;
-
-    /// <summary>
-    /// Sets the duration for the progress demonstration.
-    /// </summary>
-    /// <param name="durationSeconds">The duration in seconds (must be positive).</param>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown when duration is less than or equal to 0.</exception>
-    public void SetDuration(int durationSeconds)
-    {
-        if (durationSeconds <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(durationSeconds), "Duration must be greater than 0.");
-        }
-
-        _durationSeconds = durationSeconds;
-        logger.LogInformation("Progress duration set to {DurationSeconds} seconds", durationSeconds);
-    }
-
     /// <summary>
     /// Executes the progress command and displays a progress bar with multiple tasks.
     /// </summary>
     /// <returns>Exit code (0 for success, 1 for failure).</returns>
-    public async Task<int> ExecuteAsync()
+    public override async Task<int> ExecuteAsync()
     {
         try
         {
-            logger.LogInformation("Executing progress command with duration {DurationSeconds}s", _durationSeconds);
+            logger.LogInformation(Messages.Log.ProgressCommand_Executing, Options.DurationSeconds);
 
             await AnsiConsole.Progress()
                 .Columns(
@@ -61,11 +29,11 @@ public class ProgressCommandHandler(ILogger<ProgressCommandHandler> logger) : IP
                 )
                 .StartAsync(async ctx =>
                 {
-                    var task1 = ctx.AddTask("[green]Processing files[/]");
-                    var task2 = ctx.AddTask("[yellow]Downloading data[/]");
-                    var task3 = ctx.AddTask("[cyan]Building cache[/]");
+                    var task1 = ctx.AddTask(Messages.Ui.Progress_TaskProcessingFiles);
+                    var task2 = ctx.AddTask(Messages.Ui.Progress_TaskDownloadingData);
+                    var task3 = ctx.AddTask(Messages.Ui.Progress_TaskBuildingCache);
 
-                    var steps = _durationSeconds * 10;
+                    var steps = Options.DurationSeconds * 10;
                     for (int i = 0; i < steps; i++)
                     {
                         await Task.Delay(100);
@@ -83,20 +51,20 @@ public class ProgressCommandHandler(ILogger<ProgressCommandHandler> logger) : IP
                     }
                 });
 
-            AnsiConsole.MarkupLine("[bold green]✓ All tasks completed![/]");
-            logger.LogInformation("Progress command completed successfully");
+            AnsiConsole.MarkupLine($"[bold green]{Messages.Ui.Progress_AllTasksCompleted}[/]");
+            logger.LogInformation(Messages.Log.ProgressCommand_Completed);
 
             return 0;
         }
         catch (OperationCanceledException ex)
         {
-            logger.LogWarning(ex, "Progress command was cancelled");
+            logger.LogWarning(ex, Messages.Log.ProgressCommand_Cancelled);
             throw;
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error executing progress command");
-            AnsiConsole.MarkupLine($"[red]Error: {ex.Message}[/]");
+            logger.LogError(ex, Messages.Log.ProgressCommand_ExecutionError);
+            AnsiConsole.MarkupLine($"[red]{string.Format(Messages.Error.Command_ExecutionError, ex.Message)}[/]");
             return 1;
         }
     }

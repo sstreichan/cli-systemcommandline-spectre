@@ -1,4 +1,7 @@
-namespace SystemCommandLineSpectre.Infrastructure;
+namespace SystemCommandLineSpectre.Console.Infrastructure;
+
+using Microsoft.Extensions.DependencyInjection;
+using SystemCommandLineSpectre.Console.Commands;
 
 /// <summary>
 /// Provides extension methods for configuring dependency injection containers.
@@ -15,8 +18,12 @@ public static class ServiceCollectionExtensions
     {
         ArgumentNullException.ThrowIfNull(services);
 
+        // Register command factory (singleton for better performance)
+        services.AddSingleton<ICommandFactory, CommandFactory>();
+
+        // Register command handlers (scoped for per-command isolation)
         services.AddScoped<IInfoCommandHandler, InfoCommandHandler>();
-        services.AddScoped<IProgressCommandHandler, ProgressCommandHandler>();
+        services.AddScoped<CommandHandler<ProgressCommandOptions>, ProgressCommandHandler>();
 
         return services;
     }
